@@ -513,13 +513,7 @@ impl KalkValue {
             output.push_str(&format!(" {}", unit));
         }
 
-        let new_value = KalkValue::Number(new_real, new_imaginary, unit.clone());
-
-        if let Some(estimate) = new_value.estimate() {
-            if estimate.value != output && radix == 10 {
-                output.push_str(&format!("{}", estimate.value));
-            }
-        } else if has_scientific_notation && !is_engineering_mode {
+        if has_scientific_notation && !is_engineering_mode {
             output.insert_str(0, &format!("{}", self));
         }
 

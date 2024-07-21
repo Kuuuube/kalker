@@ -38,6 +38,39 @@ impl CalculationResult {
         self.value.to_string_big()
     }
 
+    #[wasm_bindgen(js_name = toStringClean)]
+    pub fn to_string_clean(&self) -> String {
+        let value = if self.radix == 10 {
+            self.value.to_string_pretty_radix(10, ScientificNotationFormat::Normal)
+        } else {
+            format!(
+                "{}\n{}",
+                self.value.to_string_pretty_radix(10, ScientificNotationFormat::Normal),
+                self.value.to_string_pretty_radix(self.radix, ScientificNotationFormat::Normal),
+            )
+        };
+
+        let decimal_count = if let Some(dot_index) = value.chars().position(|c| c == '.') {
+            let end_index = value.chars().position(|c| c == ' ' || c == 'i').unwrap_or(value.len()) - 1;
+
+            if end_index > dot_index { end_index - dot_index } else { 0 }
+        } else {
+            0
+        };
+
+        let equation_variable = if let Some(name) = &self.equation_variable {
+            format!("{} ", name)
+        } else {
+            String::new()
+        };
+
+        if self.is_approximation || decimal_count == 10 {
+            format!("{}", equation_variable)
+        } else {
+            format!("{}", value)
+        }
+    }
+
     #[wasm_bindgen(js_name = toPrettyStringWithFormat)]
     pub fn to_string_pretty_format(&self, format: ScientificNotationFormat) -> String {
         let value = if self.radix == 10 {

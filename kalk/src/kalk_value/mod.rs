@@ -429,6 +429,103 @@ impl KalkValue {
         output
     }
 
+    pub fn to_string_clean_radix(&self, radix: u8, format: ScientificNotationFormat) -> String {
+        let (real, imaginary, unit) = match self {
+            KalkValue::Number(real, imaginary, unit) => (real, imaginary, unit),
+            _ => return self.to_string(),
+        };
+
+        let real_f64 = self.to_f64();
+        let imaginary_f64 = self.imaginary_to_f64();
+        if real_f64.is_nan() || imaginary_f64.is_nan() {
+            return String::from("Not defined.");
+        }
+
+        if real_f64.is_infinite() {
+            return format!("{}∞", if real_f64.is_sign_negative() { "-" } else { "" });
+        }
+
+        let sci_notation_real = self.to_scientific_notation(ComplexNumberType::Real);
+        let mut new_real = real.clone();
+        let mut new_imaginary = imaginary.clone();
+        let mut has_scientific_notation = false;
+        let is_engineering_mode = matches!(format, ScientificNotationFormat::Engineering);
+        let result_str = if is_engineering_mode {
+            has_scientific_notation = true;
+
+            sci_notation_real.to_string_format(ScientificNotationFormat::Engineering)
+        } else if (-6..8).contains(&sci_notation_real.exponent) || real == &0f64 {
+            self.to_string_real(radix)
+        } else if sci_notation_real.exponent <= -14 {
+            new_real = float!(0);
+
+            String::from("0")
+        } else if radix == 10 {
+            has_scientific_notation = true;
+
+            sci_notation_real.to_string_format(format)
+        } else {
+            self.to_string_real(radix)
+        };
+
+        let sci_notation_imaginary = self.to_scientific_notation(ComplexNumberType::Imaginary);
+        let result_str_imaginary = if is_engineering_mode {
+            has_scientific_notation = true;
+
+            sci_notation_imaginary.to_string_format(ScientificNotationFormat::Engineering)
+        } else if (-6..8).contains(&sci_notation_imaginary.exponent)
+            || imaginary == &0f64
+            || imaginary == &1f64
+        {
+            self.to_string_imaginary(radix, true)
+        } else if sci_notation_imaginary.exponent <= -14 {
+            new_imaginary = float!(0);
+            String::from("0")
+        } else if radix == 10 {
+            has_scientific_notation = true;
+
+            sci_notation_imaginary.to_string_format(format)
+        } else {
+            self.to_string_real(radix)
+        };
+
+        let mut output = result_str;
+        if imaginary != &0f64 && new_imaginary != 0f64 && result_str_imaginary != "0" {
+            // If the real value is 0, and there is an imaginary one,
+            // clear the output so that the real value is not shown.
+            if output == "0" {
+                output = String::new();
+            }
+
+            // If there is a real value as well
+            if !output.is_empty() {
+                output.push_str(&format!(
+                    " {} {}",
+                    if imaginary < &0f64 { "-" } else { "+" },
+                    result_str_imaginary.trim_start_matches('-'),
+                ));
+            } else {
+                output.push_str(&result_str_imaginary);
+            }
+        }
+
+        if let Some(unit) = unit {
+            output.push_str(&format!(" {}", unit));
+        }
+
+        let new_value = KalkValue::Number(new_real, new_imaginary, unit.clone());
+
+        if let Some(estimate) = new_value.estimate() {
+            if estimate.value != output && radix == 10 {
+                output.push_str(&format!("{}", estimate.value));
+            }
+        } else if has_scientific_notation && !is_engineering_mode {
+            output.insert_str(0, &format!("{}", self));
+        }
+
+        output
+    }
+
     pub fn to_string_pretty(&self, format: ScientificNotationFormat) -> String {
         self.to_string_pretty_radix(10, format)
     }

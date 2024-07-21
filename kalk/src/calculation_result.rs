@@ -41,12 +41,12 @@ impl CalculationResult {
     #[wasm_bindgen(js_name = toStringClean)]
     pub fn to_string_clean(&self) -> String {
         let value = if self.radix == 10 {
-            self.value.to_string_pretty_radix(10, ScientificNotationFormat::Normal)
+            self.value.to_string_clean_radix(10, ScientificNotationFormat::Normal)
         } else {
             format!(
                 "{}\n{}",
-                self.value.to_string_pretty_radix(10, ScientificNotationFormat::Normal),
-                self.value.to_string_pretty_radix(self.radix, ScientificNotationFormat::Normal),
+                self.value.to_string_clean_radix(10, ScientificNotationFormat::Normal),
+                self.value.to_string_clean_radix(self.radix, ScientificNotationFormat::Normal),
             )
         };
 
@@ -58,14 +58,8 @@ impl CalculationResult {
             0
         };
 
-        let equation_variable = if let Some(name) = &self.equation_variable {
-            format!("{} ", name)
-        } else {
-            String::new()
-        };
-
         if self.is_approximation || decimal_count == 10 {
-            format!("{}", equation_variable)
+            format!("{}", value)
         } else {
             format!("{}", value)
         }

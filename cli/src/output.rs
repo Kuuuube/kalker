@@ -20,7 +20,7 @@ pub fn eval(
             }
 
             if precision == DEFAULT_PRECISION {
-                let mut result_str = result.to_string_pretty_format(format);
+                let mut result_str = result.to_string_clean();
                 if no_leading_equal {
                     result_str = result_str
                         .trim_start_matches('=')

@@ -513,6 +513,10 @@ impl KalkValue {
             output.push_str(&format!(" {}", unit));
         }
 
+        if format!("{}", self).len() < 50 {
+            output = format!("{}", self);
+        }
+
         output
     }
 
@@ -1313,7 +1317,7 @@ pub fn format_number_big(input: &Float) -> String {
         }
     }
 
-    spaced(&result)
+    return result;
 }
 
 #[cfg(not(feature = "rug"))]

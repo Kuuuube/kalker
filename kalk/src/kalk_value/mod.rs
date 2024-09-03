@@ -513,10 +513,6 @@ impl KalkValue {
             output.push_str(&format!(" {}", unit));
         }
 
-        if has_scientific_notation && !is_engineering_mode {
-            output.insert_str(0, &format!("{}", self));
-        }
-
         output
     }
 

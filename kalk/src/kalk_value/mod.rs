@@ -513,8 +513,9 @@ impl KalkValue {
             output.push_str(&format!(" {}", unit));
         }
 
-        if format!("{}", self).len() < 50 {
-            output = format!("{}", self);
+        let current_real = self.clone().values().0;
+        if !self.has_imaginary() && format!("{}", self).len() < 50 && ((current_real < 1 && current_real > -1) || current_real > 1000000 || current_real < -1000000) {
+            output = format!("{}", self).trim_end_matches('0').to_string();
         }
 
         output

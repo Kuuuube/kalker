@@ -429,7 +429,7 @@ impl KalkValue {
         output
     }
 
-    pub fn to_string_clean_radix(&self, radix: u8, format: ScientificNotationFormat) -> String {
+    pub fn to_string_clean_radix(&self, radix: u8) -> String {
         let (real, imaginary, unit) = match self {
             KalkValue::Number(real, imaginary, unit) => (real, imaginary, unit),
             _ => return self.to_string(),
@@ -449,12 +449,7 @@ impl KalkValue {
         let mut new_real = real.clone();
         let mut new_imaginary = imaginary.clone();
         let mut has_scientific_notation = false;
-        let is_engineering_mode = matches!(format, ScientificNotationFormat::Engineering);
-        let result_str = if is_engineering_mode {
-            has_scientific_notation = true;
-
-            sci_notation_real.to_string_format(ScientificNotationFormat::Engineering)
-        } else if (-6..8).contains(&sci_notation_real.exponent) || real == &0f64 {
+        let result_str = if (-6..8).contains(&sci_notation_real.exponent) || real == &0f64 {
             self.to_string_real(radix)
         } else if sci_notation_real.exponent <= -14 {
             new_real = float!(0);
@@ -463,17 +458,13 @@ impl KalkValue {
         } else if radix == 10 {
             has_scientific_notation = true;
 
-            sci_notation_real.to_string_format(format)
+            sci_notation_real.to_string_format(ScientificNotationFormat::Normal)
         } else {
             self.to_string_real(radix)
         };
 
         let sci_notation_imaginary = self.to_scientific_notation(ComplexNumberType::Imaginary);
-        let result_str_imaginary = if is_engineering_mode {
-            has_scientific_notation = true;
-
-            sci_notation_imaginary.to_string_format(ScientificNotationFormat::Engineering)
-        } else if (-6..8).contains(&sci_notation_imaginary.exponent)
+        let result_str_imaginary = if (-6..8).contains(&sci_notation_imaginary.exponent)
             || imaginary == &0f64
             || imaginary == &1f64
         {
@@ -484,7 +475,7 @@ impl KalkValue {
         } else if radix == 10 {
             has_scientific_notation = true;
 
-            sci_notation_imaginary.to_string_format(format)
+            sci_notation_imaginary.to_string_format(ScientificNotationFormat::Normal)
         } else {
             self.to_string_real(radix)
         };

@@ -40,7 +40,7 @@ impl CalculationResult {
 
     #[wasm_bindgen(js_name = toStringClean)]
     pub fn to_string_clean(&self) -> String {
-        let value = self.value.to_string_clean_radix(10, ScientificNotationFormat::Normal);
+        let value = self.value.to_string_clean_radix(10);
 
         let decimal_count = if let Some(dot_index) = value.chars().position(|c| c == '.') {
             let end_index = value.chars().position(|c| c == ' ' || c == 'i').unwrap_or(value.len()) - 1;

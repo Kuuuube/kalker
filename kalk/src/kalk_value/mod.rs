@@ -1294,6 +1294,18 @@ pub fn format_number_big(input: &Float) -> String {
         input_str
     };
 
+    if let Some(e_index) = result.find('e') {
+        let e_number_string = result.get((e_index + 1)..).unwrap_or_default();
+        let e_number = e_number_string.parse::<i32>().unwrap_or_default();
+
+        let dot_index = result.find('.').unwrap_or_default();
+        result = result.replace(".", "");
+        let new_dot_index: usize = dot_index + e_number as usize;
+        if new_dot_index <= result.len() {
+            result.insert(dot_index + e_number as usize, '.');
+        }
+    }
+
     if let Some(dot_index) = result.find('.') {
         let decimal_count = result.len() - dot_index;
         if decimal_count > 10 {

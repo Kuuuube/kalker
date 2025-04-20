@@ -429,7 +429,8 @@ impl KalkValue {
         output
     }
 
-    pub fn to_string_clean_radix(&self, radix: u8) -> String {
+    pub fn to_string_clean_radix(&self) -> String {
+        let radix = 10;
         let (real, imaginary, unit) = match self {
             KalkValue::Number(real, imaginary, unit) => (real, imaginary, unit),
             _ => return self.to_string(),

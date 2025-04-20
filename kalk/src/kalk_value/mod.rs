@@ -1302,7 +1302,7 @@ pub fn format_number_big(input: &Float) -> String {
         result = result.replace(".", "");
         let new_dot_index: usize = dot_index + e_number as usize;
         if new_dot_index <= result.len() {
-            result.insert(dot_index + e_number as usize, '.');
+            result.insert(new_dot_index, '.');
         }
     }
 

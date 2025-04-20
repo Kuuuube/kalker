@@ -453,7 +453,7 @@ impl KalkValue {
         } else if sci_notation_real.exponent <= -14 {
             String::from("0")
         } else {
-            self.to_string_real(radix)
+            sci_notation_real.to_string_format(ScientificNotationFormat::Normal)
         };
 
         let sci_notation_imaginary = self.to_scientific_notation(ComplexNumberType::Imaginary);
@@ -466,7 +466,7 @@ impl KalkValue {
             new_imaginary = float!(0);
             String::from("0")
         } else {
-            self.to_string_real(radix)
+            sci_notation_real.to_string_format(ScientificNotationFormat::Normal)
         };
 
         let mut output = result_str;

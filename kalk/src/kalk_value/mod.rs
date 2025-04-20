@@ -1285,7 +1285,7 @@ pub fn format_number_big(input: &Float) -> String {
     }
 
     let input_str = input.to_string();
-    let mut result = if input_str.contains('.') {
+    return if input_str.contains('.') {
         input_str
             .trim_end_matches('0')
             .trim_end_matches('.')
@@ -1293,15 +1293,6 @@ pub fn format_number_big(input: &Float) -> String {
     } else {
         input_str
     };
-
-    if let Some(dot_index) = result.find('.') {
-        let decimal_count = result.len() - dot_index;
-        if decimal_count > 10 {
-            result = result[..(result.len() - decimal_count + 10)].to_string();
-        }
-    }
-
-    return result;
 }
 
 #[cfg(not(feature = "rug"))]
